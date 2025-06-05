@@ -9,8 +9,31 @@
     "target": "ES2023",
     "sourceMap": true,
     "outDir": "./dist",
-    "baseUrl": "./",
+    "baseUrl": "./src",
     "incremental": true,
+    "paths": {
+      "@/*": [
+        "*"
+      ],
+      "@type/*": [
+        "types/*"
+      ],
+      "@entities/*": [
+        "entities/*"
+      ],
+      "@features/*": [
+        "features/*"
+      ],
+      "@common/*": [
+        "common/*"
+      ],
+      "@utils/*": [
+        "utils/*"
+      ],
+      "@config/*": [
+        "config/*"
+      ]
+    },
     "skipLibCheck": true,
     "strictNullChecks": true,
     "forceConsistentCasingInFileNames": true,
