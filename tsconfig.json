@@ -18,8 +18,8 @@
       "@type/*": [
         "types/*"
       ],
-      "@entities/*": [
-        "entities/*"
+      "@database/*": [
+        "database/*"
       ],
       "@features/*": [
         "features/*"

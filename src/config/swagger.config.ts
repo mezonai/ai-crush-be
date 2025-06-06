@@ -5,7 +5,7 @@ export const configSwagger = (app: INestApplication) => {
   const config = new DocumentBuilder()
     .setTitle('AI-Crush')
     .setDescription("AI-Crush's API definition")
-    .setVersion('0.1')
+    .setVersion('1.0')
     .addBearerAuth()
     .build();
 

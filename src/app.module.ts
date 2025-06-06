@@ -1,27 +1,11 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { envFilePath } from './config/env-path.config';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { dataSourceOption } from './config/data-source.config';
-import { UserModule } from './features/user/user.module';
-import { APP_FILTER } from '@nestjs/core';
-import { HttpExceptionFilter } from './common/filter/http-exception.filter';
+import { UserModule } from './modules/user/user.module';
+import DatabaseModule from '@/database/database.module';
 
 @Module({
-  imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-      envFilePath: envFilePath
-    }),
-    TypeOrmModule.forRoot(dataSourceOption),
-    UserModule
-  ],
+  imports: [ConfigModule.forRoot({}), DatabaseModule, UserModule],
   controllers: [],
-  providers: [
-    {
-      provide: APP_FILTER,
-      useClass: HttpExceptionFilter,
-    },
-  ],
+  providers: [],
 })
-export class AppModule { }
+export class AppModule {}
