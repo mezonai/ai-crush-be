@@ -18,3 +18,9 @@ export class UserDetailDto {
   @Expose()
   age: number;
 }
+
+export class UserExistResponse {
+  @ApiProperty({ example: false })
+  @Expose()
+  isExist: boolean;
+}
