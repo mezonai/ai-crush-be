@@ -1,7 +1,7 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { UserRepository } from './user.repository';
 import { instanceToPlain, plainToInstance } from 'class-transformer';
-import { CreateUserResponseDto, UserDetailDto, UserExistResponseDto } from './types/response.dto';
+import { CreateUserResponseDto, MezonUserDetailDto, UserDetailDto, UserExistResponseDto } from './types/response.dto';
 import { CreateUserRequestDto } from './types/request.dto';
 import { User } from '@/database/entities/user.entity';
 
@@ -21,8 +21,38 @@ export class UserService {
     return plainToInstance(UserDetailDto, user, { excludeExtraneousValues: true });
   }
 
-  async checkUserExistByMezonId(userId: string): Promise<UserExistResponseDto> {
-    const user = await this.userRepository.findUserByIdentity(userId);
+  async getUserByEmail(email: string): Promise<UserDetailDto> {
+    const user = await this.userRepository.findUserByEmail(email);
+    if (!user) {
+      throw new NotFoundException(`User with email ${email} not found.`);
+    }
+
+    if (user.deletedAt) {
+      throw new NotFoundException(`User with email ${email} has been deleted.`);
+    }
+
+    return plainToInstance(UserDetailDto, user, { excludeExtraneousValues: true });
+  }
+
+  async getUserByIdentity(identityId: string): Promise<MezonUserDetailDto> {
+    const user = await this.userRepository.findUserByIdentity(identityId);
+    if (!user) {
+      throw new NotFoundException(`User with identity ID ${identityId} not found.`);
+    }
+
+    if (user.deletedAt) {
+      throw new NotFoundException(`User with identity ID ${identityId} has been deleted.`);
+    }
+
+    return plainToInstance(MezonUserDetailDto, user, { excludeExtraneousValues: true });
+  }
+
+  async checkUserExistByMezonId(identityId: string): Promise<UserExistResponseDto> {
+    const user = await this.userRepository.findUserByIdentity(identityId);
+    if (user?.deletedAt) {
+      throw new NotFoundException(`User has been deleted.`);
+    }
+
     return { isExist: !!user } as UserExistResponseDto;
   }
 
