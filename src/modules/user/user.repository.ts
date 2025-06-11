@@ -15,9 +15,14 @@ export class UserRepository extends BaseRepository {
     });
   }
 
-  async findUserByMezonId(userMezonId: string): Promise<User | null> {
+  async findUserByIdentity(identityId: string): Promise<User | null> {
     return this.postRepository().findOne({
-      where: { identityId: userMezonId },
+      where: { identityId },
     });
+  }
+
+  async createUser(userData: User): Promise<User> {
+    const user = this.postRepository().create(userData);
+    return await this.postRepository().save(user);
   }
 }

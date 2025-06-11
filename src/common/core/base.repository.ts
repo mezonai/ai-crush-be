@@ -1,15 +1,15 @@
-import { InjectDataSource } from '@nestjs/typeorm';
+import { Injectable } from '@nestjs/common';
 import { DataSource, EntityManager, EntityTarget, ObjectLiteral, Repository } from 'typeorm';
 
+@Injectable()
 export abstract class BaseRepository {
-  constructor(@InjectDataSource() private readonly dataSource: DataSource) { }
+  constructor(private readonly dataSource: DataSource) { }
 
   // We do this so we have the ability to run queries inside transactions.
   private getEntityManager(entityManager?: EntityManager): EntityManager {
     if (entityManager) {
       return entityManager;
     }
-
     return this.dataSource.manager;
   }
 

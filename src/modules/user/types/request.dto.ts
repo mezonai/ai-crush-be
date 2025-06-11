@@ -1,18 +1,23 @@
+import { Gender } from '@/common/types/common';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEmail, IsInt, IsString, MaxLength } from 'class-validator';
 
 export class CreateUserRequestDto {
-  @ApiProperty({
-    name: 'id',
-    description: 'Unique identifier for the user',
-    example: '123e4567-e89b-12d3-a456-426614174000',
-  })
+  @ApiProperty()
   @IsString()
-  id: string;
+  webData: string;
+
+  @IsString()
+  @ApiProperty()
+  identityId: string;
 
   @IsEmail()
   @ApiProperty()
   email: string;
+
+  @IsString()
+  @ApiProperty()
+  avatarUrl: string;
 
   @IsString()
   @MaxLength(255)
@@ -22,4 +27,8 @@ export class CreateUserRequestDto {
   @IsInt()
   @ApiProperty()
   age: number;
+
+  @IsString()
+  @ApiProperty()
+  gender: Gender;
 }

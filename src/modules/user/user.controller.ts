@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { UserService } from './user.service';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { UserDetailDto, UserExistResponse } from './types/response.dto';
+import { CreateUserResponseDto, UserDetailDto, UserExistResponseDto } from './types/response.dto';
 import { UUIDParam } from '@/common/decorators/transform.decorator';
 import { ResultResponse } from '@/common/interfaces/base';
 import { CreateUserRequestDto } from './types/request.dto';
@@ -19,7 +19,6 @@ export class UserController {
   @Get('/:userId')
   async getUserById(@UUIDParam('userId') userId: string): Promise<ResultResponse<UserDetailDto>> {
     return {
-      message: 'User retrieved successfully',
       data: await this.userService.getUserById(userId),
     };
   }
@@ -35,17 +34,20 @@ export class UserController {
   @ApiResponse({
     status: 200,
     description: 'User existence checked successfully',
-    type: UserExistResponse,
+    type: UserExistResponseDto,
   })
-  async checkUserExistByMezonId(userMezonId: string): Promise<ResultResponse<UserExistResponse>> {
+  async checkUserExistByMezonId(userMezonId: string): Promise<ResultResponse<UserExistResponseDto>> {
+    const response = await this.userService.checkUserExistByMezonId(userMezonId);
     return {
-      message: 'User existence checked successfully',
-      data: await this.userService.checkUserExistByMezonId(userMezonId),
-    };
+      data: response,
+    } as ResultResponse<UserExistResponseDto>;
   }
 
   @Post('/')
-  createUser(@Body() request: CreateUserRequestDto): any {
-    return {};
+  async createUser(@Body() request: CreateUserRequestDto): Promise<ResultResponse<CreateUserResponseDto>> {
+    const response = await this.userService.createUser(request);
+    return {
+      data: response,
+    } as ResultResponse<CreateUserResponseDto>;
   }
 }

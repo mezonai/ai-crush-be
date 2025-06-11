@@ -19,8 +19,17 @@ export class UserDetailDto {
   age: number;
 }
 
-export class UserExistResponse {
+export class UserExistResponseDto {
   @ApiProperty({ example: false })
   @Expose()
   isExist: boolean;
+}
+export class CreateUserResponseDto {
+  @ApiProperty()
+  @Expose()
+  accessToken: string;
+
+  @ApiProperty()
+  @Expose()
+  refreshToken: string;
 }
