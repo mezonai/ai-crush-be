@@ -14,4 +14,10 @@ export class UserRepository extends BaseRepository {
       where: { id: userId },
     });
   }
+
+  async findUserByMezonId(userMezonId: string): Promise<User | null> {
+    return this.postRepository().findOne({
+      where: { identityId: userMezonId },
+    });
+  }
 }
