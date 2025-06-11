@@ -18,3 +18,13 @@ export class UserDetailDto {
   @Expose()
   age: number;
 }
+
+export class CreateUserResponseDto {
+  @ApiProperty()
+  @Expose()
+  accessToken: string;
+
+  @ApiProperty()
+  @Expose()
+  refreshToken: string;
+}

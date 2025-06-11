@@ -1,5 +1,7 @@
+import { Injectable } from '@nestjs/common';
 import { DataSource, EntityManager, EntityTarget, ObjectLiteral, Repository } from 'typeorm';
 
+@Injectable()
 export abstract class BaseRepository {
   constructor(private readonly dataSource: DataSource) {}
 
@@ -8,7 +10,6 @@ export abstract class BaseRepository {
     if (entityManager) {
       return entityManager;
     }
-
     return this.dataSource.manager;
   }
 

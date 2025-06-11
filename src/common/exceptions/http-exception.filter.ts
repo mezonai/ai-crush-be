@@ -2,6 +2,7 @@
 import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus, Logger } from '@nestjs/common';
 import { BaseExceptionFilter } from '@nestjs/core';
 import { Request, Response } from 'express';
+import { ResultResponse } from '../interfaces/base';
 
 @Catch(HttpException)
 export class GlobalExceptionFilter extends BaseExceptionFilter implements ExceptionFilter {
@@ -21,9 +22,11 @@ export class GlobalExceptionFilter extends BaseExceptionFilter implements Except
       }
 
       response.status(status).json({
-        message,
-        message_code,
-      });
+        error: {
+          message,
+          code: message_code,
+        },
+      } as ResultResponse);
     } else {
       super.catch(exception, host);
     }

@@ -14,4 +14,15 @@ export class UserRepository extends BaseRepository {
       where: { id: userId },
     });
   }
+
+  async findUserByIdentity(identityId: string): Promise<User | null> {
+    return this.postRepository().findOne({
+      where: { identityId },
+    });
+  }
+
+  async createUser(userData: User): Promise<User> {
+    const user = this.postRepository().create(userData);
+    return await this.postRepository().save(user);
+  }
 }
