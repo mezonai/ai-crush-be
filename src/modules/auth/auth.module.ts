@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { UserModule } from '../user/user.module';
@@ -10,10 +10,7 @@ import { AccessTokenStrategy } from './strategy/accessToken.strategy';
 import { RefreshTokenStrategy } from './strategy/refreshToken.strategy';
 
 @Module({
-  imports: [
-    UserModule,
-    ConfigModule.forFeature(authConfig),
-  ],
+  imports: [forwardRef(() => UserModule), ConfigModule.forFeature(authConfig)],
   providers: [
     AuthService,
     AccessTokenStrategy,
@@ -48,6 +45,6 @@ import { RefreshTokenStrategy } from './strategy/refreshToken.strategy';
     },
   ],
   controllers: [AuthController],
-  exports: [],
+  exports: [AuthService],
 })
-export class AuthModule { }
+export class AuthModule {}

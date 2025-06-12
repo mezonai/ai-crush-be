@@ -1,19 +1,34 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { UserService } from './user.service';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { CreateUserResponseDto, UserDetailDto, UserExistResponseDto } from './types/response.dto';
+import {
+  CreateUserResponseDto,
+  UserDetailDto,
+  UserExistResponseDto,
+  UserFavoritesResponseDto,
+} from './types/response.dto';
 import { UUIDParam } from '@/common/decorators/transform.decorator';
 import { ResultResponse } from '@/common/interfaces/base';
 import { CreateUserRequestDto } from './types/request.dto';
+import { USER_FAVORITES } from '@/common/core/users';
 
 @ApiTags('Users')
-@Controller('user')
+@Controller('users')
 export class UserController {
-  constructor(private readonly userService: UserService) { }
+  constructor(private readonly userService: UserService) {}
 
   @Get('')
   getHello(): string {
     return this.userService.getUser();
+  }
+
+  @Get('/favorites')
+  getUserFavorites(): ResultResponse<UserFavoritesResponseDto> {
+    return {
+      data: {
+        favorites: USER_FAVORITES,
+      } as UserFavoritesResponseDto,
+    };
   }
 
   @Get('/:userId')

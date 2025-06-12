@@ -27,7 +27,7 @@ export class UserRepository extends BaseRepository {
     });
   }
 
-  async createUser(userData: User): Promise<User> {
+  async createUser(userData: Partial<User>): Promise<User> {
     const user = this.postRepository().create(userData);
     return await this.postRepository().save(user);
   }

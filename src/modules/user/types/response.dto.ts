@@ -1,3 +1,4 @@
+import { UserFavorites } from '@/common/types/common';
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
 
@@ -44,4 +45,10 @@ export class CreateUserResponseDto {
   @ApiProperty()
   @Expose()
   refreshToken: string;
+}
+
+export class UserFavoritesResponseDto {
+  @ApiProperty()
+  @Expose()
+  favorites: UserFavorites[];
 }

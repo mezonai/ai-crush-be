@@ -1,13 +1,29 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { UserRepository } from './user.repository';
 import { instanceToPlain, plainToInstance } from 'class-transformer';
-import { CreateUserResponseDto, MezonUserDetailDto, UserDetailDto, UserExistResponseDto, UserDetailIncludeRefreshTokenDto } from './types/response.dto';
+import {
+  CreateUserResponseDto,
+  MezonUserDetailDto,
+  UserDetailDto,
+  UserExistResponseDto,
+  UserDetailIncludeRefreshTokenDto,
+} from './types/response.dto';
 import { CreateUserRequestDto } from './types/request.dto';
 import { User } from '@/database/entities/user.entity';
+import { generateMezonHash } from '@/utils/hash';
+import { UserMezonData, WebAppData } from '../auth/types/auth.type';
+import { MezonEnv } from '@/types/env';
+import { ConfigService } from '@nestjs/config';
+import { AuthService } from '../auth/auth.service';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly userRepository: UserRepository) { }
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly userRepository: UserRepository,
+    @Inject(forwardRef(() => AuthService))
+    private readonly authService: AuthService,
+  ) {}
 
   getUser(): string {
     return 'Hello World!';
@@ -28,7 +44,6 @@ export class UserService {
     }
     return plainToInstance(UserDetailIncludeRefreshTokenDto, user, { excludeExtraneousValues: true });
   }
-
 
   async getUserByEmail(email: string): Promise<UserDetailDto> {
     const user = await this.userRepository.findUserByEmail(email);
@@ -75,19 +90,35 @@ export class UserService {
   }
 
   async createUser(request: CreateUserRequestDto): Promise<CreateUserResponseDto> {
-    //TODO: validate request data
-    const user = await this.userRepository.findUserByIdentity(request.identityId);
+    const mezonConfig = this.configService.get<MezonEnv>('mezon');
+    const { appToken, expiresTimeOffset } = mezonConfig as MezonEnv;
+    const {
+      hash,
+      user: userMezon,
+      auth_date,
+    } = Object.fromEntries<WebAppData | any>(new URLSearchParams(decodeURIComponent(request.webAppData))) as WebAppData;
+    const { id: identityId } = JSON.parse(userMezon) as UserMezonData;
+    const timeNow = new Date().getTime() / 1000;
+    const timeOffset = Number(expiresTimeOffset);
+    const isHashExpired = Number(auth_date) >= timeNow - timeOffset;
+    // TODO
+    // const hashGenerate = generateMezonHash(request.webAppData, appToken);
+    // if (hashGenerate !== hash || !isHashExpired) {
+    //   throw new BadRequestException('Invalid hash');
+    // }
+    const user = await this.userRepository.findUserByIdentity(identityId);
 
     if (user) {
-      throw new BadRequestException(`User with identity ID ${request.identityId} already exists.`);
+      throw new BadRequestException(`User with identity ID ${identityId} already exists.`);
     }
 
     const userData = plainToInstance(User, instanceToPlain(request));
     const newUser = await this.userRepository.createUser(userData);
-    //TODO: Implement actual token generation logic
+    const { accessToken, refreshToken } = this.authService.generateToken(newUser.id, newUser.email);
+    await this.saveRefreshToken(newUser.id, refreshToken);
     return {
-      accessToken: 'dummyAccess',
-      refreshToken: 'dummyRefresh',
+      accessToken,
+      refreshToken,
     } as CreateUserResponseDto;
   }
 }

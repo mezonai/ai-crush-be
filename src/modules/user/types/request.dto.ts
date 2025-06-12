@@ -1,11 +1,12 @@
 import { Gender } from '@/common/types/common';
 import { ApiProperty } from '@nestjs/swagger';
+import { Exclude } from 'class-transformer';
 import { IsEmail, IsInt, IsString, MaxLength } from 'class-validator';
 
 export class CreateUserRequestDto {
   @ApiProperty()
   @IsString()
-  webData: string;
+  webAppData: string;
 
   @IsString()
   @ApiProperty()
@@ -31,4 +32,12 @@ export class CreateUserRequestDto {
   @IsString()
   @ApiProperty()
   gender: Gender;
+
+  @IsString()
+  @ApiProperty()
+  description: string;
+
+  @IsString()
+  @ApiProperty()
+  favorites: string;
 }

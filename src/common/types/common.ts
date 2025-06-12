@@ -47,7 +47,6 @@ export const CHARACTER_REWARD = {
 } as const;
 export type CharacterRewardType = (typeof CHARACTER_REWARD)[keyof typeof CHARACTER_REWARD];
 
-export type UserFavorites = string[];
 export const CHARACTER_MAJOR_NAME = {
   IT: CHARACTER_MAJOR.IT.name,
   ART: CHARACTER_MAJOR.ART.name,
@@ -106,3 +105,8 @@ export const TRANSACTION_STATUS = {
   FAILED: 'failed',
 } as const;
 export type TransactionStatus = (typeof TRANSACTION_STATUS)[keyof typeof TRANSACTION_STATUS];
+
+export type UserFavorites = {
+  id: number;
+  value: string;
+};

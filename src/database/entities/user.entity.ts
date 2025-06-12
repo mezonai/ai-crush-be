@@ -1,6 +1,6 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { BaseEntity } from './user-base.entity';
-import { Gender, UserFavorites } from '@/common/types/common';
+import { Gender } from '@/common/types/common';
 import { UserCharacter } from './user-character.entity';
 import { UserQuestionHistory } from './user-question-history.entity';
 import { UserExtraReward } from './user-extra-reward.entity';
@@ -45,7 +45,7 @@ export class User extends BaseEntity {
   gender: Gender;
 
   @Column({ type: 'jsonb', name: 'favorites', nullable: true })
-  favorites: UserFavorites;
+  favorites: string;
 
   @Column({ type: 'varchar', name: 'refresh_token', nullable: true }) refreshToken: string;
 
