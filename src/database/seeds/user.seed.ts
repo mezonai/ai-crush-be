@@ -8,18 +8,19 @@ export async function seedUserData(dataSource: DataSource): Promise<void> {
   try {
     const userData: Partial<User>[] = [
       {
-        avatarUrl: '"https://cdn.mezon.ai/0/1929366333426765824/1929366333426765800/1748832242252_undefinedavatar.jpg_croppedWEBP"',
+        avatarUrl:
+          '"https://cdn.mezon.ai/0/1929366333426765824/1929366333426765800/1748832242252_undefinedavatar.jpg_croppedWEBP"',
         identityId: '1929366333426765824',
         userName: 'trinh.lenhat',
         language: 'vi',
         tokenBalance: '1000',
-        gameTurns: "10",
+        gameTurns: '10',
         email: 'trinh@email.com',
-        age: "25",
+        age: '25',
         gender: 'male',
-        favorites: ['poker', 'chess'],
-      }
-    ]
+        favorites: JSON.stringify(['poker', 'chess']),
+      },
+    ];
     await queryRunner.manager.getRepository(User).insert(userData);
 
     await queryRunner.commitTransaction();

@@ -1,4 +1,4 @@
-import { BadRequestException, Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { BadRequestException, forwardRef, Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { LoginMezonHashRequestDto } from './types/request.dto';
 import { ConfigService } from '@nestjs/config';
 import { UserMezonData, WebAppData } from './types/auth.type';
@@ -14,6 +14,7 @@ export class AuthService {
   private readonly logger = new Logger(AuthService.name);
   constructor(
     private readonly configService: ConfigService,
+    @Inject(forwardRef(() => UserService))
     private readonly userService: UserService,
     @Inject('JWT_ACCESS_TOKEN_SERVICE')
     private readonly jwtAccessTokenService: JwtService,
@@ -21,7 +22,7 @@ export class AuthService {
     private readonly jwtRefreshTokenService: JwtService,
   ) { }
 
-  private generateToken(userId: string, email: string) {
+  public generateToken(userId: string, email: string) {
     const accessToken = this.jwtAccessTokenService.sign({ userId, email });
     const refreshToken = this.jwtRefreshTokenService.sign({ userId, email });
     return { accessToken, refreshToken };
