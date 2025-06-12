@@ -1,10 +1,10 @@
 import { applyDecorators, UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiUnauthorizedResponse } from '@nestjs/swagger';
-import { AuthGuard } from '../guards/auth.guard';
 
 export function Auth(): MethodDecorator {
   return applyDecorators(
-    UseGuards(AuthGuard),
+    UseGuards(AuthGuard('jwt')),
     ApiBearerAuth(),
     ApiUnauthorizedResponse({ description: 'Unauthorized' }),
   );

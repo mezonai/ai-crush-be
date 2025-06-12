@@ -4,9 +4,10 @@ import { ConfigService } from '@nestjs/config';
 import { UserMezonData, WebAppData } from './types/auth.type';
 import { generateMezonHash } from '@/utils/hash';
 import { MezonEnv } from '@/types/env';
-import { LoginMezonHashResponseDto } from './types/response.dto';
+import { JWTResponseDto } from './types/response.dto';
 import { UserService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
+import { UserDetailIncludeRefreshTokenDto } from '../user/types/response.dto';
 
 @Injectable()
 export class AuthService {
@@ -20,13 +21,13 @@ export class AuthService {
     private readonly jwtRefreshTokenService: JwtService,
   ) { }
 
-  private generateToken(identityId: string, email: string) {
-    const accessToken = this.jwtAccessTokenService.sign({ identityId, email });
-    const refreshToken = this.jwtRefreshTokenService.sign({ identityId, email });
+  private generateToken(userId: string, email: string) {
+    const accessToken = this.jwtAccessTokenService.sign({ userId, email });
+    const refreshToken = this.jwtRefreshTokenService.sign({ userId, email });
     return { accessToken, refreshToken };
   }
 
-  async verifyMezonHash(payload: LoginMezonHashRequestDto): Promise<LoginMezonHashResponseDto> {
+  async loginMezon(payload: LoginMezonHashRequestDto): Promise<JWTResponseDto> {
     const { web_app_data } = payload;
     const mezonConfig = this.configService.get<MezonEnv>('mezon');
     const { appToken, expiresTimeOffset } = mezonConfig as MezonEnv;
@@ -44,12 +45,23 @@ export class AuthService {
       throw new BadRequestException('Invalid hash');
     }
 
-    const user = await this.userService.checkUserExistByMezonId(identityId);
+    const user = await this.userService.getUserByIdentity(identityId);
     if (!user) {
       throw new NotFoundException(`User ${email} not found`);
     }
 
-    const { accessToken, refreshToken } = this.generateToken(identityId, email);
-    return { accessToken, refreshToken } as LoginMezonHashResponseDto;
+    const { id: userId } = user;
+    const { accessToken, refreshToken } = this.generateToken(userId, email);
+    await this.userService.saveRefreshToken(userId, refreshToken);
+
+    return { accessToken, refreshToken } as JWTResponseDto;
+  }
+
+  async refreshToken(user: UserDetailIncludeRefreshTokenDto): Promise<JWTResponseDto> {
+    const { id: userId, email } = user;
+    const { accessToken, refreshToken } = this.generateToken(userId, email);
+    await this.userService.saveRefreshToken(userId, refreshToken);
+
+    return { accessToken, refreshToken };
   }
 }

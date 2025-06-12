@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { UserRepository } from './user.repository';
 import { instanceToPlain, plainToInstance } from 'class-transformer';
-import { CreateUserResponseDto, MezonUserDetailDto, UserDetailDto, UserExistResponseDto } from './types/response.dto';
+import { CreateUserResponseDto, MezonUserDetailDto, UserDetailDto, UserExistResponseDto, UserDetailIncludeRefreshTokenDto } from './types/response.dto';
 import { CreateUserRequestDto } from './types/request.dto';
 import { User } from '@/database/entities/user.entity';
 
@@ -20,6 +20,15 @@ export class UserService {
     }
     return plainToInstance(UserDetailDto, user, { excludeExtraneousValues: true });
   }
+
+  async getUserWithRefreshTokenById(userId: string): Promise<UserDetailIncludeRefreshTokenDto> {
+    const user = await this.userRepository.findUserById(userId);
+    if (!user) {
+      throw new BadRequestException(`User with ID ${userId} not found.`);
+    }
+    return plainToInstance(UserDetailIncludeRefreshTokenDto, user, { excludeExtraneousValues: true });
+  }
+
 
   async getUserByEmail(email: string): Promise<UserDetailDto> {
     const user = await this.userRepository.findUserByEmail(email);
@@ -54,6 +63,15 @@ export class UserService {
     }
 
     return { isExist: !!user } as UserExistResponseDto;
+  }
+
+  async saveRefreshToken(userId: string, refreshToken: string): Promise<void> {
+    const user = await this.userRepository.findUserById(userId);
+
+    if (!user) {
+      throw new BadRequestException(`User with Id ${userId} not exists.`);
+    }
+    return await this.userRepository.saveRefreshToken(userId, refreshToken);
   }
 
   async createUser(request: CreateUserRequestDto): Promise<CreateUserResponseDto> {

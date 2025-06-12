@@ -7,7 +7,7 @@ export class JwtPayload {
   email: string;
 
   @IsString()
-  identityId: string;
+  userId: string;
 
   @IsNumber()
   iat: number;
@@ -16,7 +16,7 @@ export class JwtPayload {
   exp: number;
 }
 
-export class LoginMezonHashResponseDto {
+export class JWTResponseDto {
   @ApiProperty()
   @Expose()
   @IsString()

@@ -19,6 +19,11 @@ export class UserDetailDto {
   age: number;
 }
 
+export class UserDetailIncludeRefreshTokenDto extends UserDetailDto {
+  @ApiProperty()
+  @Expose()
+  refreshToken: string;
+}
 export class MezonUserDetailDto extends UserDetailDto {
   @ApiProperty()
   @Expose()

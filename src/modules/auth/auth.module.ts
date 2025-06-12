@@ -7,6 +7,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtConfigEnv } from '@/types/env';
 import authConfig from '@/config/env.config/auth.config';
 import { AccessTokenStrategy } from './strategy/accessToken.strategy';
+import { RefreshTokenStrategy } from './strategy/refreshToken.strategy';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { AccessTokenStrategy } from './strategy/accessToken.strategy';
   providers: [
     AuthService,
     AccessTokenStrategy,
+    RefreshTokenStrategy,
     {
       provide: 'JWT_ACCESS_TOKEN_SERVICE',
       useFactory: (configService: ConfigService) => {
