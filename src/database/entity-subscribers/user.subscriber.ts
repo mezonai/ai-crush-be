@@ -7,7 +7,7 @@ config();
 
 @EventSubscriber()
 export class UserSubscriber implements EntitySubscriberInterface<User> {
-  constructor() {}
+  constructor() { }
 
   listenTo(): typeof User {
     return User;
@@ -17,6 +17,6 @@ export class UserSubscriber implements EntitySubscriberInterface<User> {
   beforeUpdate(event: UpdateEvent<User>): void {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     const user = RequestContext?.currentContext?.req?.user as { id: unknown };
-    console.log('UserSubscriber beforeUpdate', user.id);
+    console.log('UserSubscriber beforeUpdate', user?.id);
   }
 }
