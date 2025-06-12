@@ -20,6 +20,23 @@ export class UserDetailDto {
   age: number;
 }
 
+export class UserDetailIncludeRefreshTokenDto extends UserDetailDto {
+  @ApiProperty()
+  @Expose()
+  refreshToken: string;
+}
+export class MezonUserDetailDto extends UserDetailDto {
+  @ApiProperty()
+  @Expose()
+  identityId: string;
+}
+
+export class UserExistResponseDto {
+  @ApiProperty({ example: false })
+  @Expose()
+  isExist: boolean;
+}
+
 export class CreateUserResponseDto {
   @ApiProperty()
   @Expose()

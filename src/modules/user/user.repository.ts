@@ -21,8 +21,21 @@ export class UserRepository extends BaseRepository {
     });
   }
 
+  async findUserByEmail(email: string): Promise<User | null> {
+    return this.postRepository().findOne({
+      where: { email },
+    });
+  }
+
   async createUser(userData: User): Promise<User> {
     const user = this.postRepository().create(userData);
     return await this.postRepository().save(user);
+  }
+
+  async saveRefreshToken(userId: string, refreshToken: string): Promise<void> {
+    await this.postRepository().update(
+      { id: userId },
+      { refreshToken }
+    );
   }
 }

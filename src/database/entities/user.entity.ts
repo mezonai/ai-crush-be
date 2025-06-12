@@ -47,6 +47,8 @@ export class User extends BaseEntity {
   @Column({ type: 'jsonb', name: 'favorites', nullable: true })
   favorites: string;
 
+  @Column({ type: 'varchar', name: 'refresh_token', nullable: true }) refreshToken: string;
+
   @OneToMany(() => BettingRoom, (bettingRoom) => bettingRoom.owner)
   userOwnerBettingRooms: BettingRoom[];
 
