@@ -76,7 +76,6 @@ export class UserService {
     if (user?.deletedAt) {
       throw new NotFoundException(`User has been deleted.`);
     }
-
     return { isExist: !!user } as UserExistResponseDto;
   }
 
@@ -101,11 +100,10 @@ export class UserService {
     const timeNow = new Date().getTime() / 1000;
     const timeOffset = Number(expiresTimeOffset);
     const isHashExpired = Number(auth_date) >= timeNow - timeOffset;
-    // TODO
-    // const hashGenerate = generateMezonHash(request.webAppData, appToken);
-    // if (hashGenerate !== hash || !isHashExpired) {
-    //   throw new BadRequestException('Invalid hash');
-    // }
+    const hashGenerate = generateMezonHash(request.webAppData, appToken);
+    if (hashGenerate !== hash || isHashExpired) {
+      throw new BadRequestException('Invalid hash');
+    }
     const user = await this.userRepository.findUserByIdentity(identityId);
 
     if (user) {

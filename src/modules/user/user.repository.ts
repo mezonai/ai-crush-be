@@ -33,9 +33,6 @@ export class UserRepository extends BaseRepository {
   }
 
   async saveRefreshToken(userId: string, refreshToken: string): Promise<void> {
-    await this.postRepository().update(
-      { id: userId },
-      { refreshToken }
-    );
+    await this.postRepository().update({ id: userId }, { refreshToken });
   }
 }
