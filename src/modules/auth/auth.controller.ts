@@ -11,7 +11,7 @@ import { UserDetailIncludeRefreshTokenDto } from '../user/types/response.dto';
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) { }
+  constructor(private readonly authService: AuthService) {}
 
   @Post('/login-mezon')
   @HttpCode(200)
@@ -28,7 +28,6 @@ export class AuthController {
       data: response,
     } as ResultResponse<JWTResponseDto>;
   }
-
 
   @Auth()
   @Post('/check')
@@ -58,7 +57,7 @@ export class AuthController {
     const user: UserDetailIncludeRefreshTokenDto = req.user;
     const response = await this.authService.refreshToken(user);
     return {
-      data: response
+      data: response,
     } as ResultResponse<JWTResponseDto>;
   }
 }

@@ -14,8 +14,9 @@ import mezonConfig from './config/env.config/mezon.config';
     }),
     DatabaseModule,
     UserModule,
-    AuthModule],
+    AuthModule,
+  ],
   controllers: [],
   providers: [],
 })
-export class AppModule { }
+export class AppModule {}

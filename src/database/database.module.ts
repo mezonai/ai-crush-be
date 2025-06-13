@@ -26,6 +26,6 @@ config();
     }),
   ],
 })
-class DatabaseModule { }
+class DatabaseModule {}
 
 export default DatabaseModule;

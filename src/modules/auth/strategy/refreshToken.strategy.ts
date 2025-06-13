@@ -11,7 +11,7 @@ import { UserDetailIncludeRefreshTokenDto } from '@/modules/user/types/response.
 export class RefreshTokenStrategy extends PassportStrategy(Strategy, 'jwt-refresh') {
   constructor(
     private readonly configService: ConfigService,
-    private readonly userService: UserService
+    private readonly userService: UserService,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),

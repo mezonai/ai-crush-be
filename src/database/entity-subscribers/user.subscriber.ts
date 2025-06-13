@@ -7,7 +7,7 @@ config();
 
 @EventSubscriber()
 export class UserSubscriber implements EntitySubscriberInterface<User> {
-  constructor() { }
+  constructor() {}
 
   listenTo(): typeof User {
     return User;
