@@ -20,7 +20,7 @@ export class AuthService {
     private readonly jwtAccessTokenService: JwtService,
     @Inject('JWT_REFRESH_TOKEN_SERVICE')
     private readonly jwtRefreshTokenService: JwtService,
-  ) { }
+  ) {}
 
   public generateToken(userId: string, email: string) {
     const accessToken = this.jwtAccessTokenService.sign({ userId, email });
@@ -32,9 +32,11 @@ export class AuthService {
     const { web_app_data } = payload;
     const mezonConfig = this.configService.get<MezonEnv>('mezon');
     const { appToken, expiresTimeOffset } = mezonConfig as MezonEnv;
-    const { hash, user: userMezon, auth_date } = Object.fromEntries<WebAppData | any>(
-      new URLSearchParams(decodeURIComponent(web_app_data)),
-    ) as WebAppData;
+    const {
+      hash,
+      user: userMezon,
+      auth_date,
+    } = Object.fromEntries<WebAppData | any>(new URLSearchParams(decodeURIComponent(web_app_data))) as WebAppData;
 
     const { mezon_id: email, id: identityId } = JSON.parse(userMezon) as UserMezonData;
     const timeNow = new Date().getTime() / 1000;
@@ -42,7 +44,7 @@ export class AuthService {
     const isHashExpired = Number(auth_date) >= timeNow - timeOffset;
 
     const hashGenerate = generateMezonHash(web_app_data, appToken);
-    if (hashGenerate !== hash || !isHashExpired) {
+    if (hashGenerate !== hash || isHashExpired) {
       throw new BadRequestException('Invalid hash');
     }
 

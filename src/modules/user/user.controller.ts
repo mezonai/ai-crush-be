@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { UserService } from './user.service';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import {
@@ -51,7 +51,9 @@ export class UserController {
     description: 'User existence checked successfully',
     type: UserExistResponseDto,
   })
-  async checkUserExistByMezonId(userMezonId: string): Promise<ResultResponse<UserExistResponseDto>> {
+  async checkUserExistByMezonId(
+    @Param('userMezonId') userMezonId: string,
+  ): Promise<ResultResponse<UserExistResponseDto>> {
     const response = await this.userService.checkUserExistByMezonId(userMezonId);
     return {
       data: response,

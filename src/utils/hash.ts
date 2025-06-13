@@ -10,14 +10,8 @@ function removeHashParam(query: string): string {
   return params.toString();
 }
 
-export function generateMezonHash(
-  dataCheckString: string,
-  appToken: string,
-): string {
+export function generateMezonHash(dataCheckString: string, appToken: string): string {
   const secretKey = hmacSHA256(appToken, 'WebAppData');
 
-  return crypto
-    .createHmac('sha256', secretKey)
-    .update(removeHashParam(dataCheckString))
-    .digest('hex');
+  return crypto.createHmac('sha256', secretKey).update(removeHashParam(dataCheckString)).digest('hex');
 }
