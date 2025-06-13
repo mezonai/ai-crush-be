@@ -36,9 +36,7 @@ export class AuthService {
     const { appToken, expiresTimeOffset } = mezonConfig as MezonEnv;
 
     const { userMezon } = verifyMezonHash(web_app_data, appToken, Number(expiresTimeOffset));
-    const { id: identityId } = userMezon;
-
-    const { mezon_id: email } = userMezon;
+    const { id: identityId, mezon_id: email } = userMezon;
     const user = await this.userService.getUserByIdentity(identityId);
     if (!user) {
       throw new NotFoundException(`User ${email} not found`);
