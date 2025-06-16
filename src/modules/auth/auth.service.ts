@@ -2,7 +2,7 @@ import { forwardRef, Inject, Injectable, Logger, NotFoundException, Unauthorized
 import { LoginMezonHashRequestDto } from './types/request.dto';
 import { ConfigService } from '@nestjs/config';
 import { verifyMezonHash } from '@/utils/hash';
-import { JwtConfigEnv, MezonEnv } from '@/types/env';
+import { MezonEnv } from '@/types/env';
 import { JwtPayload, JWTResponseDto } from './types/response.dto';
 import { UserService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
@@ -15,18 +15,15 @@ export class AuthService {
     private readonly configService: ConfigService,
     @Inject(forwardRef(() => UserService))
     private readonly userService: UserService,
-    private readonly jwtService: JwtService,
+    @Inject('JWT_ACCESS_TOKEN_SERVICE')
+    private readonly jwtAccessTokenService: JwtService,
+    @Inject('JWT_REFRESH_TOKEN_SERVICE')
+    private readonly jwtRefreshTokenService: JwtService,
   ) {}
 
   public generateToken(userId: string, email: string) {
-    const accessToken = this.jwtService.sign(
-      { userId, email },
-      { expiresIn: this.configService.get<JwtConfigEnv>('auth.jwt')!.accessTokenExpiresIn },
-    );
-    const refreshToken = this.jwtService.sign(
-      { userId, email },
-      { expiresIn: this.configService.get<JwtConfigEnv>('auth.jwt')!.refreshTokenExpiresIn },
-    );
+    const accessToken = this.jwtAccessTokenService.sign({ userId, email });
+    const refreshToken = this.jwtRefreshTokenService.sign({ userId, email });
     return { accessToken, refreshToken };
   }
 
@@ -49,8 +46,7 @@ export class AuthService {
     return { accessToken, refreshToken } as JWTResponseDto;
   }
 
-  async refreshToken(req: Request): Promise<JWTResponseDto> {
-    const presentedRefreshToken = this.getRefreshTokenFromHeaders(req);
+  async refreshToken(presentedRefreshToken: string): Promise<JWTResponseDto> {
     const user = await this.verifyRefreshToken(presentedRefreshToken);
     const { accessToken, refreshToken } = this.generateToken(user.id, user.email);
     await this.userService.saveRefreshToken(user.id, refreshToken);
@@ -58,19 +54,11 @@ export class AuthService {
     return { accessToken, refreshToken };
   }
 
-  private getRefreshTokenFromHeaders(req: Request): string {
-    const authHeader = req.headers['authorization'];
-    if (authHeader && typeof authHeader === 'string' && authHeader.startsWith('Bearer ')) {
-      return authHeader.replace('Bearer ', '').trim();
-    }
-    throw new UnauthorizedException('Refresh token is missing');
-  }
-
   private async verifyRefreshToken(presentedRefreshToken: string): Promise<UserDetailIncludeRefreshTokenDto> {
     let payload: JwtPayload;
 
     try {
-      payload = this.jwtService.verify<JwtPayload>(presentedRefreshToken);
+      payload = this.jwtRefreshTokenService.verify<JwtPayload>(presentedRefreshToken);
     } catch {
       throw new UnauthorizedException('Refresh token is invalid or expired');
     }

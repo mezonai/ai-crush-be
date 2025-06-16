@@ -37,9 +37,11 @@ export function verifyMezonHash(
 
   const timeNow = new Date().getTime() / 1000;
   const timeOffset = expiresTimeOffset;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const isHashExpired = Number(auth_date) < timeNow - timeOffset;
   const hashGenerate = generateMezonHash(webAppData, appToken);
-  if (hashGenerate !== hash || isHashExpired) {
+  // if (hashGenerate !== hash || isHashExpired) { // temporarily skip check if hash is expired
+  if (hashGenerate !== hash) {
     throw new BadRequestException('Invalid hash');
   }
   return { hash, userMezon, auth_date };

@@ -1,8 +1,8 @@
-import { Body, Controller, HttpCode, Post, Request } from '@nestjs/common';
+import { Body, Controller, HttpCode, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ResultResponse } from '@/common/interfaces/base';
-import { LoginMezonHashRequestDto } from './types/request.dto';
+import { LoginMezonHashRequestDto, RefreshTokenRequestDto } from './types/request.dto';
 import { JWTResponseDto } from './types/response.dto';
 import { Auth } from '@/common/decorators/auth.decorator';
 
@@ -43,15 +43,14 @@ export class AuthController {
 
   @Post('/refresh-token')
   @HttpCode(200)
-  @ApiOperation({ summary: 'Refresh access token using a valid refresh token in the Authorization header' })
-  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Refresh access token using a valid refresh token in the request body' })
   @ApiResponse({
     status: 200,
     description: 'Refresh tokens successfully',
     type: JWTResponseDto,
   })
-  async refreshToken(@Request() req: Request): Promise<ResultResponse<JWTResponseDto>> {
-    const response = await this.authService.refreshToken(req);
+  async refreshToken(@Body() refreshTokenRequestDto: RefreshTokenRequestDto): Promise<ResultResponse<JWTResponseDto>> {
+    const response = await this.authService.refreshToken(refreshTokenRequestDto.refreshToken);
     return {
       data: response,
     } as ResultResponse<JWTResponseDto>;

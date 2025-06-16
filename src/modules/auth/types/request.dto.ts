@@ -10,3 +10,13 @@ export class LoginMezonHashRequestDto {
   @IsString()
   web_app_data: string;
 }
+
+export class RefreshTokenRequestDto {
+  @ApiProperty({
+    description: 'Refresh token obtained from the server, used to request a new access token.',
+    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ...',
+  })
+  @IsNotEmpty()
+  @IsString()
+  refreshToken: string;
+}

@@ -8,7 +8,11 @@ export interface AuthEnv {
 }
 
 export interface JwtConfigEnv {
-  secretKey: string;
-  accessTokenExpiresIn: string;
-  refreshTokenExpiresIn: string;
+  access: JwtSecret;
+  refresh: JwtSecret;
+}
+
+export interface JwtSecret {
+  expiresIn: string;
+  secret: string;
 }

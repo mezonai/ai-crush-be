@@ -14,12 +14,29 @@ import { JWTStrategy } from './strategy/jwt.strategy';
     AuthService,
     JWTStrategy,
     {
-      provide: JwtService,
+      provide: 'JWT_ACCESS_TOKEN_SERVICE',
       useFactory: (configService: ConfigService) => {
         const jwt = configService.get<JwtConfigEnv>('auth.jwt')!;
         if (!jwt) throw new Error('JWT config is missing!');
         return new JwtService({
-          secret: jwt.secretKey,
+          secret: jwt.access.secret,
+          signOptions: {
+            expiresIn: jwt.access.expiresIn,
+          },
+        });
+      },
+      inject: [ConfigService],
+    },
+    {
+      provide: 'JWT_REFRESH_TOKEN_SERVICE',
+      useFactory: (configService: ConfigService) => {
+        const jwt = configService.get<JwtConfigEnv>('auth.jwt')!;
+        if (!jwt) throw new Error('JWT config is missing!');
+        return new JwtService({
+          secret: jwt.refresh.secret,
+          signOptions: {
+            expiresIn: jwt.refresh.expiresIn,
+          },
         });
       },
       inject: [ConfigService],
