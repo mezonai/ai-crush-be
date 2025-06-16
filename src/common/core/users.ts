@@ -21,4 +21,24 @@ export const USER_FAVORITES = [
     id: 5,
     value: 'Nghe nhạc',
   },
+  {
+    id: 6,
+    value: 'Đọc truyện tranh',
+  },
+  {
+    id: 7,
+    value: 'Bơi lội',
+  },
+  {
+    id: 8,
+    value: 'Chơi game',
+  },
+  {
+    id: 9,
+    value: 'Shopping',
+  },
+  {
+    id: 10,
+    value: 'Khám phá ẩm thực',
+  },
 ] as UserFavorites[];

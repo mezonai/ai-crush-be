@@ -23,6 +23,11 @@ export class UserController {
   }
 
   @Get('/favorites')
+  @ApiOperation({ summary: 'Get the user favorites' })
+  @ApiResponse({
+    status: 200,
+    type: ResultResponse<UserFavoritesResponseDto>,
+  })
   getUserFavorites(): ResultResponse<UserFavoritesResponseDto> {
     return {
       data: {
