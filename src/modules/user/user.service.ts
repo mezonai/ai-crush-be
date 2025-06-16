@@ -24,10 +24,6 @@ export class UserService {
     private readonly authService: AuthService,
   ) {}
 
-  getUser(): string {
-    return 'Hello World!';
-  }
-
   async getUserById(userId: string): Promise<UserDetailDto> {
     const user = await this.userRepository.findUserById(userId);
     if (!user) {

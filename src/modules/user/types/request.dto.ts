@@ -1,6 +1,5 @@
 import { Gender } from '@/common/types/common';
 import { ApiProperty } from '@nestjs/swagger';
-import { Exclude } from 'class-transformer';
 import { IsEmail, IsInt, IsString, MaxLength } from 'class-validator';
 
 export class CreateUserRequestDto {
