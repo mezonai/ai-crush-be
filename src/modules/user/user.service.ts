@@ -10,8 +10,7 @@ import {
 } from './types/response.dto';
 import { CreateUserRequestDto } from './types/request.dto';
 import { User } from '@/database/entities/user.entity';
-import { generateMezonHash } from '@/utils/hash';
-import { UserMezonData, WebAppData } from '../auth/types/auth.type';
+import { verifyMezonHash } from '@/utils/hash';
 import { MezonEnv } from '@/types/env';
 import { ConfigService } from '@nestjs/config';
 import { AuthService } from '../auth/auth.service';
@@ -91,21 +90,9 @@ export class UserService {
   async createUser(request: CreateUserRequestDto): Promise<CreateUserResponseDto> {
     const mezonConfig = this.configService.get<MezonEnv>('mezon');
     const { appToken, expiresTimeOffset } = mezonConfig as MezonEnv;
-    const {
-      hash,
-      user: userMezon,
-      auth_date,
-    } = Object.fromEntries<WebAppData | any>(new URLSearchParams(decodeURIComponent(request.webAppData))) as WebAppData;
-    const { id: identityId } = JSON.parse(userMezon) as UserMezonData;
-    const timeNow = new Date().getTime() / 1000;
-    const timeOffset = Number(expiresTimeOffset);
-    const isHashExpired = Number(auth_date) >= timeNow - timeOffset;
-    const hashGenerate = generateMezonHash(request.webAppData, appToken);
-    if (hashGenerate !== hash || isHashExpired) {
-      throw new BadRequestException('Invalid hash');
-    }
+    const { userMezon } = verifyMezonHash(request.webAppData, appToken, Number(expiresTimeOffset));
+    const { id: identityId } = userMezon;
     const user = await this.userRepository.findUserByIdentity(identityId);
-
     if (user) {
       throw new BadRequestException(`User with identity ID ${identityId} already exists.`);
     }

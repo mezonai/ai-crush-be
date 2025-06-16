@@ -1,10 +1,9 @@
-import { BadRequestException, forwardRef, Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, Logger, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { LoginMezonHashRequestDto } from './types/request.dto';
 import { ConfigService } from '@nestjs/config';
-import { UserMezonData, WebAppData } from './types/auth.type';
-import { generateMezonHash } from '@/utils/hash';
+import { verifyMezonHash } from '@/utils/hash';
 import { MezonEnv } from '@/types/env';
-import { JWTResponseDto } from './types/response.dto';
+import { JwtPayload, JWTResponseDto } from './types/response.dto';
 import { UserService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { UserDetailIncludeRefreshTokenDto } from '../user/types/response.dto';
@@ -32,22 +31,9 @@ export class AuthService {
     const { web_app_data } = payload;
     const mezonConfig = this.configService.get<MezonEnv>('mezon');
     const { appToken, expiresTimeOffset } = mezonConfig as MezonEnv;
-    const {
-      hash,
-      user: userMezon,
-      auth_date,
-    } = Object.fromEntries<WebAppData | any>(new URLSearchParams(decodeURIComponent(web_app_data))) as WebAppData;
 
-    const { mezon_id: email, id: identityId } = JSON.parse(userMezon) as UserMezonData;
-    const timeNow = new Date().getTime() / 1000;
-    const timeOffset = Number(expiresTimeOffset);
-    const isHashExpired = Number(auth_date) >= timeNow - timeOffset;
-
-    const hashGenerate = generateMezonHash(web_app_data, appToken);
-    if (hashGenerate !== hash || isHashExpired) {
-      throw new BadRequestException('Invalid hash');
-    }
-
+    const { userMezon } = verifyMezonHash(web_app_data, appToken, Number(expiresTimeOffset));
+    const { id: identityId, mezon_id: email } = userMezon;
     const user = await this.userService.getUserByIdentity(identityId);
     if (!user) {
       throw new NotFoundException(`User ${email} not found`);
@@ -60,11 +46,37 @@ export class AuthService {
     return { accessToken, refreshToken } as JWTResponseDto;
   }
 
-  async refreshToken(user: UserDetailIncludeRefreshTokenDto): Promise<JWTResponseDto> {
-    const { id: userId, email } = user;
-    const { accessToken, refreshToken } = this.generateToken(userId, email);
-    await this.userService.saveRefreshToken(userId, refreshToken);
+  async refreshToken(presentedRefreshToken: string): Promise<JWTResponseDto> {
+    const user = await this.verifyRefreshToken(presentedRefreshToken);
+    const { accessToken, refreshToken } = this.generateToken(user.id, user.email);
+    await this.userService.saveRefreshToken(user.id, refreshToken);
 
     return { accessToken, refreshToken };
+  }
+
+  private async verifyRefreshToken(presentedRefreshToken: string): Promise<UserDetailIncludeRefreshTokenDto> {
+    let payload: JwtPayload;
+
+    try {
+      payload = this.jwtRefreshTokenService.verify<JwtPayload>(presentedRefreshToken);
+    } catch {
+      throw new UnauthorizedException('Refresh token is invalid or expired');
+    }
+
+    const { exp, email, userId } = payload;
+    if (!exp || !email || !userId) {
+      throw new UnauthorizedException('Refresh token payload is invalid');
+    }
+    const remainingTime = exp * 1000 - Date.now();
+    if (remainingTime <= 0) {
+      throw new UnauthorizedException('Refresh token has expired');
+    }
+
+    const user = await this.userService.getUserWithRefreshTokenById(userId);
+    if (!user || user.email !== email || user.refreshToken !== presentedRefreshToken) {
+      throw new UnauthorizedException('User or refresh token not found');
+    }
+
+    return user;
   }
 }

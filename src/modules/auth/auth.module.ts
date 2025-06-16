@@ -6,15 +6,13 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtConfigEnv } from '@/types/env';
 import authConfig from '@/config/env.config/auth.config';
-import { AccessTokenStrategy } from './strategy/accessToken.strategy';
-import { RefreshTokenStrategy } from './strategy/refreshToken.strategy';
+import { JWTStrategy } from './strategy/jwt.strategy';
 
 @Module({
   imports: [forwardRef(() => UserModule), ConfigModule.forFeature(authConfig)],
   providers: [
     AuthService,
-    AccessTokenStrategy,
-    RefreshTokenStrategy,
+    JWTStrategy,
     {
       provide: 'JWT_ACCESS_TOKEN_SERVICE',
       useFactory: (configService: ConfigService) => {
