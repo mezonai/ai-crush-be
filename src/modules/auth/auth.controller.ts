@@ -1,12 +1,10 @@
-import { Body, Controller, HttpCode, Post, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, HttpCode, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ResultResponse } from '@/common/interfaces/base';
-import { LoginMezonHashRequestDto } from './types/request.dto';
+import { LoginMezonHashRequestDto, RefreshTokenRequestDto } from './types/request.dto';
 import { JWTResponseDto } from './types/response.dto';
 import { Auth } from '@/common/decorators/auth.decorator';
-import { AuthGuard } from '@nestjs/passport';
-import { UserDetailIncludeRefreshTokenDto } from '../user/types/response.dto';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -37,25 +35,22 @@ export class AuthController {
     status: 200,
     description: 'Authenticated',
   })
-  async healthCheck(): Promise<ResultResponse<string>> {
-    return {
+  healthCheck(): Promise<ResultResponse<string>> {
+    return Promise.resolve({
       data: 'Auth service is healthy',
-    } as ResultResponse<string>;
+    });
   }
 
-  @UseGuards(AuthGuard('jwt-refresh'))
   @Post('/refresh-token')
   @HttpCode(200)
-  @ApiOperation({ summary: 'Refresh access token using a valid refresh token in the Authorization header' })
-  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Refresh access token using a valid refresh token in the request body' })
   @ApiResponse({
     status: 200,
     description: 'Refresh tokens successfully',
     type: JWTResponseDto,
   })
-  async refreshToken(@Request() req): Promise<ResultResponse<JWTResponseDto>> {
-    const user: UserDetailIncludeRefreshTokenDto = req.user;
-    const response = await this.authService.refreshToken(user);
+  async refreshToken(@Body() refreshTokenRequestDto: RefreshTokenRequestDto): Promise<ResultResponse<JWTResponseDto>> {
+    const response = await this.authService.refreshToken(refreshTokenRequestDto.refreshToken);
     return {
       data: response,
     } as ResultResponse<JWTResponseDto>;
