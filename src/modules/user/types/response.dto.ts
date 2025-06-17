@@ -21,7 +21,7 @@ export class UserDetailDto {
 
   @ApiProperty({ description: 'Avatar URL' })
   @Expose()
-  avatar: string;
+  avatarUrl: string;
 
   @ApiProperty({ description: 'Gender' })
   @Expose()
