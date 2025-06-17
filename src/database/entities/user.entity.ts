@@ -30,10 +30,10 @@ export class User extends BaseEntity {
   tokenBalance: string;
 
   @Column({ type: 'int', default: 0, name: 'game_turns' })
-  gameTurns: string;
+  gameTurns: number;
 
   @Column({ type: 'timestamp', nullable: true, name: 'game_turn_last_used' })
-  gameTurnLastUsed: Date;
+  gameTurnLastUsed: Date | null;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
   email: string;

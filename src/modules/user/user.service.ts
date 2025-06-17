@@ -16,6 +16,9 @@ import { ConfigService } from '@nestjs/config';
 import { AuthService } from '../auth/auth.service';
 import { Cron } from '@nestjs/schedule';
 
+const MAX_TURNS = 5;
+const TURN_REGEN_TIME = 2 * 60 * 1000;
+
 @Injectable()
 export class UserService {
   private readonly logger = new Logger(UserService.name);
@@ -105,9 +108,41 @@ export class UserService {
     } as CreateUserResponseDto;
   }
 
+  async regenGameTurnsForUser(user: User, maxTurns: number, turnRegenTime: number): Promise<void> {
+    const gameTurns = user.gameTurns;
+    const gameTurnLastUsed = user.gameTurnLastUsed ? new Date(user.gameTurnLastUsed) : null;
+
+    if (gameTurns >= maxTurns || !gameTurnLastUsed) return;
+
+    const now = Date.now();
+    const msSinceLastUse = now - gameTurnLastUsed.getTime();
+    const regenTurns = Math.floor(msSinceLastUse / turnRegenTime);
+    if (regenTurns > 0) {
+      const newTurns = Math.min(maxTurns, gameTurns + regenTurns);
+      let newLastUsed: Date | null;
+
+      if (newTurns < maxTurns) {
+        newLastUsed = new Date(gameTurnLastUsed.getTime() + regenTurns * turnRegenTime);
+      } else {
+        newLastUsed = null;
+      }
+
+      await this.userRepository.updateGameTurnsById(user.id, newTurns, newLastUsed);
+    }
+  }
+
+  async regenGameTurnsForAllUsers() {
+    const users = await this.userRepository.findUsersWithLessThanMaxTurns(MAX_TURNS);
+
+    for (const user of users) {
+      await this.regenGameTurnsForUser(user, MAX_TURNS, TURN_REGEN_TIME);
+    }
+  }
+
   // This cron run every minute
   @Cron('0 * * * * *')
-  handleIncrementUserGameTurns() {
-    this.logger.log('code here');
+  async handleIncrementUserGameTurns() {
+    this.logger.log('Running cronjob: regen game turns for all users');
+    await this.regenGameTurnsForAllUsers();
   }
 }

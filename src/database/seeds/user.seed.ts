@@ -14,7 +14,7 @@ export async function seedUserData(dataSource: DataSource): Promise<void> {
         userName: 'trinh.lenhat',
         language: 'vi',
         tokenBalance: '1000',
-        gameTurns: '10',
+        gameTurns: 10,
         email: 'trinh@email.com',
         age: '25',
         gender: 'male',
