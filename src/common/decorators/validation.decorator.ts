@@ -32,3 +32,22 @@ export function IsDateGreaterThanOrEqualDate(property: string, validationOptions
     });
   };
 }
+
+export function IsPositiveNumber(validationOptions?: ValidationOptions) {
+  return (object: object, propertyName: string) => {
+    registerDecorator({
+      name: 'IsPositiveNumber',
+      target: object.constructor,
+      propertyName: propertyName,
+      options: validationOptions,
+      validator: {
+        validate(value: any) {
+          return typeof value === 'number' && value > 0;
+        },
+        defaultMessage() {
+          return `${propertyName} must be a positive number`;
+        },
+      },
+    });
+  };
+}

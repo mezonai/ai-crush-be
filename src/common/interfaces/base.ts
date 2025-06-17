@@ -5,7 +5,15 @@ type AppError = {
   code?: string;
 };
 
-export class ResultResponse<T = null> {
+export type PaginationMeta = {
+  totalCount: number;
+  currentPage: number;
+  limit: number;
+};
+
+export class ResultResponse<T = null, V = null> {
+  meta?: V;
+
   @ApiProperty()
   data?: T;
 

@@ -1,5 +1,8 @@
 import { AuthEnv } from '@/types/env';
 import { registerAs } from '@nestjs/config';
+import { config } from 'dotenv';
+
+config();
 
 export default registerAs(
   'auth',

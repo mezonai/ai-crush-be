@@ -17,25 +17,24 @@ export class JWTStrategy extends PassportStrategy(Strategy, 'jwt') {
     if (!secret) {
       throw new Error('JWT secret is not defined');
     }
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     super({
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       secretOrKey: secret,
       ignoreExpiration: false,
     });
   }
 
-  async validate(payload: JwtPayload): Promise<UserDetailDto> {
+  validate(payload: JwtPayload): { id: string; email: string } {
     const { exp, email, userId } = payload;
     const remainingTime = exp * 1000 - Date.now();
     if (remainingTime <= 0) {
       throw new UnauthorizedException('Access token has expired');
     }
-
-    const user = await this.userService.getUserById(userId);
-    if (!user || user.email !== email) {
-      throw new UnauthorizedException('User not found');
-    }
-
-    return user;
+    return {
+      id: userId,
+      email,
+    };
   }
 }
