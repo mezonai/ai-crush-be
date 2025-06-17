@@ -4,6 +4,8 @@ import { UserModule } from './modules/user/user.module';
 import DatabaseModule from '@/database/database.module';
 import { AuthModule } from './modules/auth/auth.module';
 import mezonConfig from './config/env.config/mezon.config';
+import { CharacterModule } from './modules/character/character.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -15,6 +17,8 @@ import mezonConfig from './config/env.config/mezon.config';
     DatabaseModule,
     UserModule,
     AuthModule,
+    CharacterModule,
+    ScheduleModule.forRoot(),
   ],
   controllers: [],
   providers: [],

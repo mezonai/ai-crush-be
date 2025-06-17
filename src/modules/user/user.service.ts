@@ -1,4 +1,4 @@
-import { BadRequestException, forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, forwardRef, Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { UserRepository } from './user.repository';
 import { instanceToPlain, plainToInstance } from 'class-transformer';
 import {
@@ -14,9 +14,11 @@ import { verifyMezonHash } from '@/utils/hash';
 import { MezonEnv } from '@/types/env';
 import { ConfigService } from '@nestjs/config';
 import { AuthService } from '../auth/auth.service';
+import { Cron } from '@nestjs/schedule';
 
 @Injectable()
 export class UserService {
+  private readonly logger = new Logger(UserService.name);
   constructor(
     private readonly configService: ConfigService,
     private readonly userRepository: UserRepository,
@@ -101,5 +103,11 @@ export class UserService {
       accessToken,
       refreshToken,
     } as CreateUserResponseDto;
+  }
+
+  // This cron run every minute
+  @Cron('0 * * * * *')
+  handleIncrementUserGameTurns() {
+    this.logger.log('code here');
   }
 }
