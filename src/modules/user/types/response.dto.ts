@@ -1,9 +1,9 @@
-import { UserFavorites } from '@/common/types/common';
+import { Gender, UserFavorites } from '@/common/types/common';
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
 
 export class UserDetailDto {
-  @ApiProperty()
+  @ApiProperty({ description: 'User ID (UUID)' })
   @Expose()
   id: string;
 
@@ -11,13 +11,41 @@ export class UserDetailDto {
   @Expose()
   email: string;
 
-  @ApiProperty()
+  @ApiProperty({ description: 'Username' })
   @Expose()
   userName: string;
 
-  @ApiProperty()
+  @ApiProperty({ description: 'Age' })
   @Expose()
   age: number;
+
+  @ApiProperty({ description: 'Avatar URL' })
+  @Expose()
+  avatarUrl: string;
+
+  @ApiProperty({ description: 'Gender' })
+  @Expose()
+  gender: Gender;
+
+  @ApiProperty({ description: 'Language (e.g., vi)' })
+  @Expose()
+  language: string;
+
+  @ApiProperty({ description: 'Favorites (JSON object)' })
+  @Expose()
+  favorites: string;
+
+  @ApiProperty({ description: 'Token balance (from Mezon)' })
+  @Expose()
+  tokenBalance: string;
+
+  @ApiProperty({ description: 'Number of game turns' })
+  @Expose()
+  gameTurns: number;
+
+  @ApiProperty({ description: 'Last time a game turn was used' })
+  @Expose()
+  gameTurnLastUsed: Date;
 }
 
 export class UserDetailIncludeRefreshTokenDto extends UserDetailDto {
@@ -26,7 +54,7 @@ export class UserDetailIncludeRefreshTokenDto extends UserDetailDto {
   refreshToken: string;
 }
 export class MezonUserDetailDto extends UserDetailDto {
-  @ApiProperty()
+  @ApiProperty({ description: 'Identity ID from Mezon (UUID)' })
   @Expose()
   identityId: string;
 }

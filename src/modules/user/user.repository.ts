@@ -1,7 +1,7 @@
 import { BaseRepository } from '@/common/core/base.repository';
 import { User } from '@/database/entities/user.entity';
 import { Injectable } from '@nestjs/common';
-import { EntityManager, Repository } from 'typeorm';
+import { EntityManager, LessThan, Repository } from 'typeorm';
 
 @Injectable()
 export class UserRepository extends BaseRepository {
@@ -34,5 +34,25 @@ export class UserRepository extends BaseRepository {
 
   async saveRefreshToken(userId: string, refreshToken: string): Promise<void> {
     await this.postRepository().update({ id: userId }, { refreshToken });
+  }
+
+  async findUsersWithLessThanMaxTurns(maxTurns: number): Promise<User[]> {
+    return this.postRepository().find({
+      where: {
+        gameTurns: LessThan(maxTurns),
+      },
+    });
+  }
+
+  async updateGameTurnsById(
+    userId: string,
+    gameTurns: number,
+    gameTurnLastUsed: Date | null,
+    entityManager?: EntityManager,
+  ): Promise<void> {
+    await this.postRepository(entityManager).update(userId, {
+      gameTurns,
+      gameTurnLastUsed,
+    });
   }
 }
